@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VTA PLATES — 3D Printed Plates for E-Bikes & E-Moto</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --black: #000000;
+    --deep: #050508;
+    --panel: #0a0a0f;
+    --blue: #2563ff;
+    --blue-light: #60a5fa;
+    --blue-glow: rgba(37,99,255,0.35);
+    --white: #ffffff;
+    --gray: #6b7280;
+    --gray-light: #9ca3af;
+    --accent: #2563ff;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Space Grotesk', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--blue);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 9999;
+    transition: transform 0.1s ease;
+    mix-blend-mode: screen;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(37,99,255,0.5);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 9998;
+    transition: transform 0.15s ease, width 0.2s, height 0.2s;
+  }
+  .cursor.hover { transform: scale(3); }
+  .cursor-ring.hover { width: 60px; height: 60px; border-color: var(--blue); }
+
+  /* CANVAS PARTICLES */
+  #particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 24px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(20px);
+    background: rgba(0,0,0,0.4);
+    border-bottom: 1px solid rgba(37,99,255,0.1);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 4px;
+    background: linear-gradient(135deg, #2563ff, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .nav-links { display: flex; gap: 36px; align-items: center; }
+  .nav-links a {
+    color: var(--gray-light); text-decoration: none;
+    font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+    font-weight: 500; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+  .nav-cta {
+    background: var(--blue); color: white !important;
+    padding: 10px 24px; border-radius: 4px;
+    font-weight: 600 !important;
+    transition: background 0.2s !important;
+  }
+  .nav-cta:hover { background: #1d4fd8 !important; color: white !important; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative; z-index: 1;
+    padding: 120px 48px 80px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 4px;
+    color: var(--blue-light);
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(80px, 16vw, 220px);
+    line-height: 0.9;
+    letter-spacing: -2px;
+    margin-bottom: 8px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+  .hero-title span {
+    background: linear-gradient(135deg, #fff 0%, #60a5fa 50%, #2563ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-sub {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 7vw, 100px);
+    letter-spacing: 8px;
+    color: rgba(255,255,255,0.12);
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.5s forwards;
+  }
+  .hero-desc {
+    font-size: 18px; color: var(--gray-light);
+    max-width: 520px; line-height: 1.7;
+    margin: 0 auto 56px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+  }
+  .hero-btns {
+    display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.7s forwards;
+  }
+  .btn-primary {
+    background: var(--blue);
+    color: white; text-decoration: none;
+    padding: 16px 40px;
+    font-size: 14px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    border-radius: 4px;
+    transition: all 0.3s;
+    border: 1px solid transparent;
+    display: inline-block;
+  }
+  .btn-primary:hover {
+    background: transparent;
+    border-color: var(--blue);
+    color: var(--blue-light);
+    box-shadow: 0 0 30px var(--blue-glow);
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--white); text-decoration: none;
+    padding: 16px 40px;
+    font-size: 14px; font-weight: 600;
+    letter-spacing: 2px; text-transform: uppercase;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: all 0.3s;
+    display: inline-flex; align-items: center; gap: 10px;
+  }
+  .btn-secondary:hover { border-color: rgba(255,255,255,0.4); }
+  .btn-secondary svg { transition: transform 0.2s; }
+  .btn-secondary:hover svg { transform: translateX(3px); }
+
+  /* GLOW ORBS */
+  .glow-orb {
+    position: absolute; border-radius: 50%;
+    filter: blur(80px); pointer-events: none;
+  }
+  .orb-1 {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(37,99,255,0.15) 0%, transparent 70%);
+    top: -100px; left: 50%; transform: translateX(-50%);
+    animation: pulse 6s infinite;
+  }
+  .orb-2 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(96,165,250,0.08) 0%, transparent 70%);
+    bottom: 0; right: -100px;
+    animation: pulse 8s 2s infinite;
+  }
+
+  /* SCROLL INDICATOR */
+  .scroll-indicator {
+    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    opacity: 0;
+    animation: fadeIn 1s 1.5s forwards;
+  }
+  .scroll-indicator span {
+    font-size: 10px; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--gray);
+    font-family: 'DM Mono', monospace;
+  }
+  .scroll-line {
+    width: 1px; height: 60px;
+    background: linear-gradient(to bottom, var(--blue), transparent);
+    animation: scrollPulse 2s infinite;
+  }
+
+  /* MARQUEE */
+  .marquee-section {
+    position: relative; z-index: 1;
+    padding: 20px 0;
+    border-top: 1px solid rgba(37,99,255,0.1);
+    border-bottom: 1px solid rgba(37,99,255,0.1);
+    overflow: hidden;
+    background: rgba(37,99,255,0.03);
+  }
+  .marquee-track {
+    display: flex; gap: 60px;
+    width: max-content;
+    animation: marquee 20s linear infinite;
+  }
+  .marquee-item {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px; letter-spacing: 6px;
+    color: var(--gray);
+    white-space: nowrap;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .marquee-dot {
+    width: 4px; height: 4px;
+    background: var(--blue); border-radius: 50%;
+  }
+
+  /* SECTION BASE */
+  section { position: relative; z-index: 1; }
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--blue-light); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-label::before {
+    content: ''; width: 30px; height: 1px; background: var(--blue);
+  }
+
+  /* SECTION TITLE shared */
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 8vw, 100px);
+    line-height: 0.95;
+    letter-spacing: 1px;
+  }
+  .section-title em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--blue), var(--blue-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* PLATES DROP SECTION */
+  .plates-section {
+    padding: 120px 48px 60px;
+    max-width: 1100px; margin: 0 auto;
+    position: relative; z-index: 1;
+  }
+  .plates-header {
+    text-align: center;
+    margin-bottom: 100px;
+  }
+  .plates-header p {
+    font-size: 16px; color: var(--gray-light);
+    margin-top: 16px; line-height: 1.6;
+  }
+
+  /* Drop lane */
+  .plates-drop-lane {
+    position: relative;
+  }
+  .plate-drop-item {
+    display: flex;
+    align-items: center;
+    gap: 48px;
+    margin-bottom: 24px;
+    opacity: 0;
+    transform: translateY(-120px);
+    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .plate-drop-item.dropped {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  /* Alternate left/right */
+  .plate-drop-item:nth-child(odd) { flex-direction: row; }
+  .plate-drop-item:nth-child(even) { flex-direction: row-reverse; }
+
+  .plate-img-wrap {
+    flex: 0 0 auto;
+    width: clamp(220px, 45%, 420px);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.07);
+    background: var(--panel);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    transition: box-shadow 0.4s, border-color 0.4s;
+    position: relative;
+  }
+  .plate-img-wrap:hover {
+    border-color: rgba(37,99,255,0.35);
+    box-shadow: 0 30px 80px rgba(37,99,255,0.18);
+  }
+  .plate-img-wrap img {
+    width: 100%; display: block;
+    object-fit: cover; aspect-ratio: 4/3;
+  }
+  /* Placeholder when no image yet */
+  .plate-img-placeholder {
+    width: 100%; aspect-ratio: 4/3;
+    background: linear-gradient(135deg, #0d0d18, #111120);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .plate-num-badge {
+    position: absolute; top: 12px; left: 12px;
+    background: rgba(0,0,0,0.7);
+    border: 1px solid rgba(37,99,255,0.3);
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 3px;
+    color: var(--blue-light);
+    text-transform: uppercase;
+  }
+  .plate-meta {
+    flex: 1;
+  }
+  .plate-index {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 80px; line-height: 1;
+    color: rgba(37,99,255,0.15);
+    margin-bottom: -8px;
+  }
+  .plate-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px; letter-spacing: 3px;
+    color: var(--white);
+    margin-bottom: 10px;
+  }
+  .plate-meta-line {
+    width: 40px; height: 2px;
+    background: var(--blue);
+    margin-bottom: 14px;
+  }
+  .plate-desc-text {
+    font-size: 14px; color: var(--gray);
+    line-height: 1.7; max-width: 280px;
+  }
+
+  /* CUSTOM CTA block */
+  .plates-custom-cta {
+    text-align: center;
+    padding: 80px 48px;
+    position: relative; z-index: 1;
+    max-width: 700px; margin: 0 auto;
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .plates-custom-cta.visible {
+    opacity: 1; transform: translateY(0);
+  }
+  .custom-divider {
+    display: flex; align-items: center; gap: 20px;
+    margin-bottom: 40px;
+  }
+  .custom-divider-line { flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+  .custom-divider-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 4px;
+    color: var(--gray); text-transform: uppercase;
+  }
+  .custom-cta-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 6vw, 72px);
+    letter-spacing: 2px; line-height: 0.95;
+    margin-bottom: 16px;
+  }
+  .custom-cta-title em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--blue), var(--blue-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .custom-cta-sub {
+    font-size: 16px; color: var(--gray-light);
+    line-height: 1.7; margin-bottom: 36px;
+  }
+
+  @media (max-width: 700px) {
+    .plate-drop-item,
+    .plate-drop-item:nth-child(even) { flex-direction: column !important; }
+    .plate-img-wrap { width: 100%; }
+    .plates-section { padding: 80px 24px 40px; }
+    .plates-custom-cta { padding: 60px 24px; }
+  }
+
+  /* FEATURES BENTO */
+  .features {
+    padding: 80px 48px 120px;
+    max-width: 1400px; margin: 0 auto;
+  }
+  .bento {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: auto;
+    gap: 16px;
+    margin-top: 60px;
+  }
+  .bento-card {
+    background: var(--panel);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 36px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    overflow: hidden;
+    position: relative;
+  }
+  .bento-card:hover {
+    border-color: rgba(37,99,255,0.3);
+    box-shadow: 0 0 40px rgba(37,99,255,0.08);
+  }
+  .bento-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 0% 0%, rgba(37,99,255,0.05), transparent 60%);
+    pointer-events: none;
+  }
+  .bento-1 { grid-column: span 7; }
+  .bento-2 { grid-column: span 5; }
+  .bento-3 { grid-column: span 4; }
+  .bento-4 { grid-column: span 4; }
+  .bento-5 { grid-column: span 4; }
+
+  .bento-icon {
+    width: 48px; height: 48px;
+    background: rgba(37,99,255,0.1);
+    border: 1px solid rgba(37,99,255,0.2);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 24px;
+    font-size: 22px;
+  }
+  .bento-card h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px; letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .bento-card p { font-size: 14px; color: var(--gray-light); line-height: 1.7; }
+  .bento-big-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 100px; line-height: 1;
+    background: linear-gradient(135deg, var(--blue), transparent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+
+  /* TIKTOK SECTION */
+  .tiktok-section {
+    padding: 80px 48px 120px;
+    max-width: 1400px; margin: 0 auto;
+  }
+  .tiktok-card {
+    background: linear-gradient(135deg, #0a0a1a, #05050f);
+    border: 1px solid rgba(37,99,255,0.2);
+    border-radius: 16px;
+    padding: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .tiktok-card::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(37,99,255,0.1), transparent 60%);
+    pointer-events: none;
+  }
+  .tiktok-content { flex: 1; }
+  .tiktok-card .section-label { margin-bottom: 24px; }
+  .tiktok-card h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 6vw, 80px);
+    letter-spacing: 2px; line-height: 0.95;
+    margin-bottom: 20px;
+  }
+  .tiktok-card p { font-size: 16px; color: var(--gray-light); line-height: 1.7; max-width: 400px; margin-bottom: 36px; }
+  .tiktok-btn {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: var(--white); color: var(--black);
+    padding: 16px 36px; border-radius: 4px;
+    text-decoration: none; font-weight: 700;
+    font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+    transition: all 0.3s;
+  }
+  .tiktok-btn:hover { background: var(--blue-light); }
+  .tiktok-stats {
+    display: flex; flex-direction: column; gap: 24px;
+    text-align: center;
+  }
+  .tiktok-stat-item {}
+  .tiktok-stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 60px; line-height: 1;
+    background: linear-gradient(135deg, var(--white), var(--blue-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .tiktok-stat-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--gray); font-family: 'DM Mono', monospace; }
+
+  /* ORDER */
+  .order-section {
+    padding: 80px 48px 120px;
+    max-width: 900px; margin: 0 auto;
+    text-align: center;
+  }
+  .order-section h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(60px, 10vw, 120px);
+    letter-spacing: 2px; line-height: 0.9;
+    margin-bottom: 24px;
+  }
+  .order-section h2 em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--blue), var(--blue-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .order-section p { font-size: 17px; color: var(--gray-light); line-height: 1.7; margin-bottom: 16px; }
+  .order-section .email-pill {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: rgba(37,99,255,0.08);
+    border: 1px solid rgba(37,99,255,0.25);
+    border-radius: 100px;
+    padding: 14px 32px;
+    font-family: 'DM Mono', monospace;
+    font-size: 16px; color: var(--blue-light);
+    text-decoration: none;
+    margin: 32px 0 48px;
+    transition: all 0.3s;
+    cursor: none;
+  }
+  .order-section .email-pill:hover {
+    background: rgba(37,99,255,0.15);
+    border-color: var(--blue);
+    box-shadow: 0 0 30px var(--blue-glow);
+  }
+  .order-steps {
+    display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+    margin-top: 40px;
+  }
+  .order-step {
+    background: var(--panel);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 28px 32px;
+    text-align: left; flex: 1; min-width: 200px; max-width: 260px;
+    transition: border-color 0.3s;
+  }
+  .order-step:hover { border-color: rgba(37,99,255,0.3); }
+  .step-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px; color: rgba(37,99,255,0.25);
+    line-height: 1; margin-bottom: 12px;
+  }
+  .step-title { font-weight: 600; font-size: 15px; margin-bottom: 6px; }
+  .step-desc { font-size: 13px; color: var(--gray); line-height: 1.6; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 60px 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 24px;
+    position: relative; z-index: 1;
+  }
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px; letter-spacing: 4px;
+    background: linear-gradient(135deg, #2563ff, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .footer-links { display: flex; gap: 32px; }
+  .footer-links a { color: var(--gray); text-decoration: none; font-size: 13px; letter-spacing: 1px; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--white); }
+  .footer-copy { font-size: 12px; color: var(--gray); font-family: 'DM Mono', monospace; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; } to { opacity: 1; }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; transform: translate(-50%) scale(1); }
+    50% { opacity: 0.8; transform: translate(-50%) scale(1.1); }
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100vh); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33% { transform: translateY(-12px) rotate(1deg); }
+    66% { transform: translateY(-6px) rotate(-1deg); }
+  }
+
+  /* SCROLL REVEAL */
+  .reveal {
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* SCANLINE EFFECT */
+  .scanline {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(37,99,255,0.3), transparent);
+    z-index: 50;
+    animation: scanline 8s linear infinite;
+    pointer-events: none;
+  }
+
+  /* GRID OVERLAY */
+  .grid-overlay {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(37,99,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(37,99,255,0.03) 1px, transparent 1px);
+    background-size: 80px 80px;
+    pointer-events: none;
+  }
+
+  /* NOISE */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    opacity: 0.4; z-index: 0; pointer-events: none;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    .hero { padding: 100px 24px 60px; }
+    .features { padding: 60px 24px; }
+    .bento { display: flex; flex-direction: column; }
+    .tiktok-section { padding: 60px 24px; }
+    .tiktok-card { flex-direction: column; padding: 48px 32px; }
+    .tiktok-stats { flex-direction: row; justify-content: center; }
+    .order-section { padding: 60px 24px; }
+    footer { padding: 40px 24px; flex-direction: column; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<canvas id="particles"></canvas>
+<div class="grid-overlay"></div>
+<div class="scanline"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">VTA PLATES</div>
+  <div class="nav-links">
+    <a href="why.html">Why VTA</a>
+    <a href="https://tiktok.com/@vta.plates" target="_blank">TikTok</a>
+    <a href="mailto:vtaplates@gmail.com" class="nav-cta">Order Now</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+
+  <div class="hero-eyebrow">— Electric. Bold. Yours. —</div>
+  <h1 class="hero-title"><span>VTA</span></h1>
+  <div class="hero-sub">PLATES</div>
+  <p class="hero-desc">
+    3D printed number plates built for E-Bikes and E-Moto riders.
+    Custom colors. Motorsport aesthetic. Made to order.
+  </p>
+  <div class="hero-btns">
+    <a href="#order" class="btn-primary">Order Yours</a>
+    <a href="https://tiktok.com/@vta.plates" target="_blank" class="btn-secondary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V9.03a8.25 8.25 0 004.83 1.56V7.15a4.85 4.85 0 01-1.06-.46z"/></svg>
+      Watch on TikTok
+    </a>
+  </div>
+
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track" id="marqueeTrack">
+    <span class="marquee-item">3D PRINTED <span class="marquee-dot"></span></span>
+    <span class="marquee-item">CUSTOM COLORS <span class="marquee-dot"></span></span>
+    <span class="marquee-item">E-BIKE PLATES <span class="marquee-dot"></span></span>
+    <span class="marquee-item">E-MOTO PLATES <span class="marquee-dot"></span></span>
+    <span class="marquee-item">MADE TO ORDER <span class="marquee-dot"></span></span>
+    <span class="marquee-item">MOTORSPORT AESTHETIC <span class="marquee-dot"></span></span>
+    <span class="marquee-item">VTA PLATES <span class="marquee-dot"></span></span>
+    <span class="marquee-item">3D PRINTED <span class="marquee-dot"></span></span>
+    <span class="marquee-item">CUSTOM COLORS <span class="marquee-dot"></span></span>
+    <span class="marquee-item">E-BIKE PLATES <span class="marquee-dot"></span></span>
+    <span class="marquee-item">E-MOTO PLATES <span class="marquee-dot"></span></span>
+    <span class="marquee-item">MADE TO ORDER <span class="marquee-dot"></span></span>
+    <span class="marquee-item">MOTORSPORT AESTHETIC <span class="marquee-dot"></span></span>
+    <span class="marquee-item">VTA PLATES <span class="marquee-dot"></span></span>
+  </div>
+</div>
+
+<!-- PLATES DROP SECTION -->
+<section class="plates-section" id="products">
+  <div class="plates-header">
+    <div class="section-label" style="justify-content:center;">Collection</div>
+    <h2 class="section-title">THE<br><em>PLATES</em></h2>
+    <p>Every plate is 3D printed and made to order. Replace each image with your own — just name them 1.png through 7.png.</p>
+  </div>
+
+  <div class="plates-drop-lane" id="dropLane">
+
+    <div class="plate-drop-item" data-index="0">
+      <div class="plate-img-wrap">
+        <img src="1.png" alt="Plate 1" onerror="this.parentElement.innerHTML='<div class=\'plate-img-placeholder\'><svg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' fill=\'none\'><rect x=\'4\' y=\'4\' width=\'52\' height=\'52\' rx=\'6\' stroke=\'rgba(37,99,255,0.3)\' stroke-width=\'1\'/><text x=\'30\' y=\'38\' text-anchor=\'middle\' fill=\'rgba(37,99,255,0.4)\' font-family=\'Bebas Neue,sans-serif\' font-size=\'28\'>1</text></svg></div><span class=\'plate-num-badge\'>Plate 01</span>'">
+        <span class="plate-num-badge">Plate 01</span>
+      </div>
+      <div class="plate-meta">
+        <div class="plate-index">01</div>
+        <div class="plate-meta-line"></div>
+        <div class="plate-desc-text">3D printed. Made to order. Built for your ride.</div>
+      </div>
+    </div>
+
+    <div class="plate-drop-item" data-index="1">
+      <div class="plate-img-wrap">
+        <img src="2.png" alt="Plate 2" onerror="this.parentElement.innerHTML='<div class=\'plate-img-placeholder\'><svg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' fill=\'none\'><rect x=\'4\' y=\'4\' width=\'52\' height=\'52\' rx=\'6\' stroke=\'rgba(37,99,255,0.3)\' stroke-width=\'1\'/><text x=\'30\' y=\'38\' text-anchor=\'middle\' fill=\'rgba(37,99,255,0.4)\' font-family=\'Bebas Neue,sans-serif\' font-size=\'28\'>2</text></svg></div><span class=\'plate-num-badge\'>Plate 02</span>'">
+        <span class="plate-num-badge">Plate 02</span>
+      </div>
+      <div class="plate-meta">
+        <div class="plate-index">02</div>
+        <div class="plate-meta-line"></div>
+        <div class="plate-desc-text">3D printed. Made to order. Built for your ride.</div>
+      </div>
+    </div>
+
+    <div class="plate-drop-item" data-index="2">
+      <div class="plate-img-wrap">
+        <img src="3.png" alt="Plate 3" onerror="this.parentElement.innerHTML='<div class=\'plate-img-placeholder\'><svg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' fill=\'none\'><rect x=\'4\' y=\'4\' width=\'52\' height=\'52\' rx=\'6\' stroke=\'rgba(37,99,255,0.3)\' stroke-width=\'1\'/><text x=\'30\' y=\'38\' text-anchor=\'middle\' fill=\'rgba(37,99,255,0.4)\' font-family=\'Bebas Neue,sans-serif\' font-size=\'28\'>3</text></svg></div><span class=\'plate-num-badge\'>Plate 03</span>'">
+        <span class="plate-num-badge">Plate 03</span>
+      </div>
+      <div class="plate-meta">
+        <div class="plate-index">03</div>
+        <div class="plate-meta-line"></div>
+        <div class="plate-desc-text">3D printed. Made to order. Built for your ride.</div>
+      </div>
+    </div>
+
+    <div class="plate-drop-item" data-index="3">
+      <div class="plate-img-wrap">
+        <img src="4.png" alt="Plate 4" onerror="this.parentElement.innerHTML='<div class=\'plate-img-placeholder\'><svg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' fill=\'none\'><rect x=\'4\' y=\'4\' width=\'52\' height=\'52\' rx=\'6\' stroke=\'rgba(37,99,255,0.3)\' stroke-width=\'1\'/><text x=\'30\' y=\'38\' text-anchor=\'middle\' fill=\'rgba(37,99,255,0.4)\' font-family=\'Bebas Neue,sans-serif\' font-size=\'28\'>4</text></svg></div><span class=\'plate-num-badge\'>Plate 04</span>'">
+        <span class="plate-num-badge">Plate 04</span>
+      </div>
+      <div class="plate-meta">
+        <div class="plate-index">04</div>
+        <div class="plate-meta-line"></div>
+        <div class="plate-desc-text">3D printed. Made to order. Built for your ride.</div>
+      </div>
+    </div>
+
+    <div class="plate-drop-item" data-index="4">
+      <div class="plate-img-wrap">
+        <img src="5.png" alt="Plate 5" onerror="this.parentElement.innerHTML='<div class=\'plate-img-placeholder\'><svg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' fill=\'none\'><rect x=\'4\' y=\'4\' width=\'52\' height=\'52\' rx=\'6\' stroke=\'rgba(37,99,255,0.3)\' stroke-width=\'1\'/><text x=\'30\' y=\'38\' text-anchor=\'middle\' fill=\'rgba(37,99,255,0.4)\' font-family=\'Bebas Neue,sans-serif\' font-size=\'28\'>5</text></svg></div><span class=\'plate-num-badge\'>Plate 05</span>'">
+        <span class="plate-num-badge">Plate 05</span>
+      </div>
+      <div class="plate-meta">
+        <div class="plate-index">05</div>
+        <div class="plate-meta-line"></div>
+        <div class="plate-desc-text">3D printed. Made to order. Built for your ride.</div>
+      </div>
+    </div>
+
+    <div class="plate-drop-item" data-index="5">
+      <div class="plate-img-wrap">
+        <img src="6.png" alt="Plate 6" onerror="this.parentElement.innerHTML='<div class=\'plate-img-placeholder\'><svg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' fill=\'none\'><rect x=\'4\' y=\'4\' width=\'52\' height=\'52\' rx=\'6\' stroke=\'rgba(37,99,255,0.3)\' stroke-width=\'1\'/><text x=\'30\' y=\'38\' text-anchor=\'middle\' fill=\'rgba(37,99,255,0.4)\' font-family=\'Bebas Neue,sans-serif\' font-size=\'28\'>6</text></svg></div><span class=\'plate-num-badge\'>Plate 06</span>'">
+        <span class="plate-num-badge">Plate 06</span>
+      </div>
+      <div class="plate-meta">
+        <div class="plate-index">06</div>
+        <div class="plate-meta-line"></div>
+        <div class="plate-desc-text">3D printed. Made to order. Built for your ride.</div>
+      </div>
+    </div>
+
+    <div class="plate-drop-item" data-index="6">
+      <div class="plate-img-wrap">
+        <img src="7.png" alt="Plate 7" onerror="this.parentElement.innerHTML='<div class=\'plate-img-placeholder\'><svg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' fill=\'none\'><rect x=\'4\' y=\'4\' width=\'52\' height=\'52\' rx=\'6\' stroke=\'rgba(37,99,255,0.3)\' stroke-width=\'1\'/><text x=\'30\' y=\'38\' text-anchor=\'middle\' fill=\'rgba(37,99,255,0.4)\' font-family=\'Bebas Neue,sans-serif\' font-size=\'28\'>7</text></svg></div><span class=\'plate-num-badge\'>Plate 07</span>'">
+        <span class="plate-num-badge">Plate 07</span>
+      </div>
+      <div class="plate-meta">
+        <div class="plate-index">07</div>
+        <div class="plate-meta-line"></div>
+        <div class="plate-desc-text">3D printed. Made to order. Built for your ride.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CUSTOM CTA -->
+<div class="plates-custom-cta" id="customCta">
+  <div class="custom-divider">
+    <div class="custom-divider-line"></div>
+    <div class="custom-divider-text">or</div>
+    <div class="custom-divider-line"></div>
+  </div>
+  <h2 class="custom-cta-title">ORDER A<br><em>CUSTOM ONE</em></h2>
+  <p class="custom-cta-sub">Don't see what you want? Tell us your color, number, and bike — we'll build it exactly how you picture it.</p>
+  <a href="mailto:vtaplates@gmail.com" class="btn-primary">Get a Custom Plate →</a>
+</div>
+
+<!-- FEATURES BENTO -->
+<section class="features reveal" id="features">
+  <div class="section-label">Why VTA</div>
+  <h2 class="section-title">BUILT<br><em>DIFFERENT</em></h2>
+  <div class="bento">
+    <div class="bento-card bento-1">
+      <div class="bento-icon">🖨️</div>
+      <div class="bento-big-number">3D</div>
+      <h3>Printed to Perfection</h3>
+      <p>Every plate is precision 3D printed — not stamped, not injection molded. That means tighter tolerances, sharper detail, and a finish that actually holds up on real rides.</p>
+    </div>
+    <div class="bento-card bento-2">
+      <div class="bento-icon">⚡</div>
+      <h3>Built for Electric</h3>
+      <p>Designed specifically for E-Bikes and E-Moto riders. Fits the mounting hardware. Looks right on the bike. No compromises for the electric era.</p>
+    </div>
+    <div class="bento-card bento-3">
+      <div class="bento-icon">🎨</div>
+      <h3>Any Color</h3>
+      <p>Pick your palette. We print it.</p>
+    </div>
+    <div class="bento-card bento-4">
+      <div class="bento-icon">📦</div>
+      <h3>Made to Order</h3>
+      <p>Nothing sits in a warehouse. Every plate is built fresh when you order it.</p>
+    </div>
+    <div class="bento-card bento-5">
+      <div class="bento-icon">🏁</div>
+      <h3>Race Aesthetic</h3>
+      <p>Motorsport DNA in every design detail. Because your ride deserves it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TIKTOK -->
+<section class="tiktok-section reveal" id="tiktok">
+  <div class="tiktok-card">
+    <div class="tiktok-content">
+      <div class="section-label">Social</div>
+      <h2>SEE THEM<br>IN THE WILD</h2>
+      <p>Follow @vta.plates on TikTok to see our plates on real builds, real tracks, and real rides. Drop a comment on what color you want next.</p>
+      <a href="https://tiktok.com/@vta.plates" target="_blank" class="tiktok-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="black"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V9.03a8.25 8.25 0 004.83 1.56V7.15a4.85 4.85 0 01-1.06-.46z"/></svg>
+        @vta.plates
+      </a>
+    </div>
+    <div class="tiktok-stats">
+      <div class="tiktok-stat-item">
+        <div class="tiktok-stat-num">∞</div>
+        <div class="tiktok-stat-label">Color Options</div>
+      </div>
+      <div class="tiktok-stat-item">
+        <div class="tiktok-stat-num">100%</div>
+        <div class="tiktok-stat-label">Made to Order</div>
+      </div>
+      <div class="tiktok-stat-item">
+        <div class="tiktok-stat-num">3D</div>
+        <div class="tiktok-stat-label">Printed</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ORDER -->
+<section class="order-section reveal" id="order">
+  <div class="section-label" style="justify-content: center; text-align: center;">Order</div>
+  <h2>GET YOUR<br><em>PLATE</em></h2>
+  <p>Ordering is simple. No cart, no checkout system. Just shoot us an email with what you want — color, number, bike model — and we'll get it built for you.</p>
+  <a href="mailto:vtaplates@gmail.com" class="email-pill">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
+    vtaplates@gmail.com
+  </a>
+  <div class="order-steps">
+    <div class="order-step">
+      <div class="step-num">01</div>
+      <div class="step-title">Email Us</div>
+      <p class="step-desc">Send your order to vtaplates@gmail.com with your color, number, and bike details.</p>
+    </div>
+    <div class="order-step">
+      <div class="step-num">02</div>
+      <div class="step-title">We Confirm</div>
+      <p class="step-desc">We'll confirm your spec and send payment details. Usually within 24 hours.</p>
+    </div>
+    <div class="order-step">
+      <div class="step-num">03</div>
+      <div class="step-title">We Print</div>
+      <p class="step-desc">Your plate goes into production. 3D printed, finished, and packed with care.</p>
+    </div>
+    <div class="order-step">
+      <div class="step-num">04</div>
+      <div class="step-title">Ride</div>
+      <p class="step-desc">Your plate ships to your door. Mount it. Shred.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">VTA PLATES</div>
+  <div class="footer-links">
+    <a href="mailto:vtaplates@gmail.com">vtaplates@gmail.com</a>
+    <a href="https://tiktok.com/@vta.plates" target="_blank">TikTok</a>
+    <a href="#order">Order</a>
+  </div>
+  <div class="footer-copy">© 2025 VTA Plates. All rights reserved.</div>
+</footer>
+
+<script>
+// CURSOR
+const cursor = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursorRing');
+let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+
+document.addEventListener('mousemove', e => {
+  mouseX = e.clientX; mouseY = e.clientY;
+  cursor.style.transform = `translate(${mouseX - 6}px, ${mouseY - 6}px)`;
+});
+function animateRing() {
+  ringX += (mouseX - ringX - 18) * 0.12;
+  ringY += (mouseY - ringY - 18) * 0.12;
+  cursorRing.style.transform = `translate(${ringX}px, ${ringY}px)`;
+  requestAnimationFrame(animateRing);
+}
+animateRing();
+
+document.querySelectorAll('a, button, .product-card, .bento-card').forEach(el => {
+  el.addEventListener('mouseenter', () => { cursor.classList.add('hover'); cursorRing.classList.add('hover'); });
+  el.addEventListener('mouseleave', () => { cursor.classList.remove('hover'); cursorRing.classList.remove('hover'); });
+});
+
+// PARTICLES
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+
+const particles = [];
+for (let i = 0; i < 80; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: (Math.random() - 0.5) * 0.3,
+    size: Math.random() * 1.5 + 0.3,
+    opacity: Math.random() * 0.4 + 0.1,
+    color: Math.random() > 0.6 ? '#2563ff' : '#ffffff'
+  });
+}
+
+function drawParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach((p, i) => {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0) p.x = canvas.width;
+    if (p.x > canvas.width) p.x = 0;
+    if (p.y < 0) p.y = canvas.height;
+    if (p.y > canvas.height) p.y = 0;
+
+    // Connect nearby particles
+    particles.forEach((p2, j) => {
+      if (i >= j) return;
+      const dx = p.x - p2.x, dy = p.y - p2.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 120) {
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(37,99,255,${0.06 * (1 - dist/120)})`;
+        ctx.lineWidth = 0.5;
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.stroke();
+      }
+    });
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = p.color === '#2563ff' ? `rgba(37,99,255,${p.opacity})` : `rgba(255,255,255,${p.opacity * 0.5})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// SCROLL REVEAL (generic sections)
+const reveals = document.querySelectorAll('.reveal');
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.1 });
+reveals.forEach(r => revealObserver.observe(r));
+
+// PLATE DROP ANIMATION
+const dropItems = document.querySelectorAll('.plate-drop-item');
+const dropObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const idx = parseInt(e.target.dataset.index) || 0;
+      setTimeout(() => {
+        e.target.classList.add('dropped');
+      }, idx * 80);
+      dropObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+dropItems.forEach(item => dropObserver.observe(item));
+
+// CUSTOM CTA reveal
+const customCta = document.getElementById('customCta');
+const ctaObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); ctaObserver.unobserve(e.target); } });
+}, { threshold: 0.2 });
+if (customCta) ctaObserver.observe(customCta);
+
+// MOUSE PARALLAX on hero
+document.addEventListener('mousemove', e => {
+  const dx = (e.clientX / window.innerWidth - 0.5) * 20;
+  const dy = (e.clientY / window.innerHeight - 0.5) * 20;
+  document.querySelector('.orb-1').style.transform = `translateX(calc(-50% + ${dx * 0.5}px)) translateY(${dy * 0.5}px)`;
+  document.querySelector('.orb-2').style.transform = `translateX(${-dx * 0.3}px) translateY(${-dy * 0.3}px)`;
+});
+</script>
+</body>
+</html>
