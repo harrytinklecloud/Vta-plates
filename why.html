@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Why VTA — VTA Plates</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --black: #000000;
+    --panel: #0a0a0f;
+    --blue: #2563ff;
+    --blue-light: #60a5fa;
+    --blue-glow: rgba(37,99,255,0.35);
+    --white: #ffffff;
+    --gray: #6b7280;
+    --gray-light: #9ca3af;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Space Grotesk', sans-serif;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* PARTICLES */
+  #particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+  /* GRID + NOISE */
+  .grid-overlay {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(37,99,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(37,99,255,0.03) 1px, transparent 1px);
+    background-size: 80px 80px;
+    pointer-events: none;
+  }
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    opacity: 0.4; z-index: 0; pointer-events: none;
+  }
+
+  /* SCANLINE */
+  .scanline {
+    position: fixed; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(37,99,255,0.3), transparent);
+    z-index: 50; animation: scanline 8s linear infinite; pointer-events: none;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 24px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(20px);
+    background: rgba(0,0,0,0.4);
+    border-bottom: 1px solid rgba(37,99,255,0.1);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px; letter-spacing: 4px;
+    background: linear-gradient(135deg, #2563ff, #60a5fa);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 36px; align-items: center; }
+  .nav-links a {
+    color: var(--gray-light); text-decoration: none;
+    font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+    font-weight: 500; transition: color 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--white); }
+  .nav-cta {
+    background: var(--blue); color: white !important;
+    padding: 10px 24px; border-radius: 4px;
+    font-weight: 600 !important; transition: background 0.2s !important;
+  }
+  .nav-cta:hover { background: #1d4fd8 !important; }
+
+  /* PAGE HERO */
+  .page-hero {
+    min-height: 60vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 160px 48px 80px;
+    position: relative; z-index: 1;
+    overflow: hidden;
+  }
+  .orb {
+    position: absolute; border-radius: 50%; pointer-events: none;
+    filter: blur(90px);
+  }
+  .orb-1 {
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(37,99,255,0.12) 0%, transparent 70%);
+    top: -200px; left: 50%; transform: translateX(-50%);
+    animation: pulse 7s infinite;
+  }
+
+  .page-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--blue-light); margin-bottom: 28px;
+    opacity: 0; animation: fadeUp 0.7s 0.2s forwards;
+  }
+  .page-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(72px, 14vw, 180px);
+    line-height: 0.9; letter-spacing: 2px;
+    opacity: 0; animation: fadeUp 0.7s 0.35s forwards;
+  }
+  .page-title em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--blue), var(--blue-light));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .page-subtitle {
+    margin-top: 28px;
+    font-size: 18px; color: var(--gray-light);
+    max-width: 520px; line-height: 1.7;
+    opacity: 0; animation: fadeUp 0.7s 0.5s forwards;
+  }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--blue-light); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-label::before { content: ''; width: 30px; height: 1px; background: var(--blue); }
+
+  /* REASON ROWS */
+  .reasons {
+    max-width: 1100px; margin: 0 auto;
+    padding: 40px 48px 120px;
+    position: relative; z-index: 1;
+  }
+
+  .reason-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    padding: 80px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    opacity: 0; transform: translateY(50px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reason-row.visible { opacity: 1; transform: translateY(0); }
+  .reason-row:last-of-type { border-bottom: none; }
+  .reason-row:nth-child(even) .reason-visual { order: -1; }
+
+  .reason-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 120px; line-height: 1;
+    color: rgba(37,99,255,0.08);
+    margin-bottom: -20px;
+  }
+  .reason-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--blue-light); margin-bottom: 16px;
+  }
+  .reason-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 5vw, 64px);
+    letter-spacing: 1px; line-height: 0.95;
+    margin-bottom: 20px;
+  }
+  .reason-bar {
+    width: 48px; height: 3px;
+    background: var(--blue);
+    margin-bottom: 20px;
+    border-radius: 2px;
+  }
+  .reason-body {
+    font-size: 16px; color: var(--gray-light);
+    line-height: 1.8; max-width: 420px;
+  }
+
+  /* VISUAL CARDS */
+  .reason-visual {
+    display: flex; align-items: center; justify-content: center;
+  }
+  .vis-card {
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px;
+    padding: 48px 40px;
+    position: relative; overflow: hidden;
+    transition: border-color 0.4s, box-shadow 0.4s;
+  }
+  .vis-card:hover {
+    border-color: rgba(37,99,255,0.3);
+    box-shadow: 0 20px 60px rgba(37,99,255,0.1);
+  }
+  .vis-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 100% 0%, rgba(37,99,255,0.06), transparent 60%);
+    pointer-events: none;
+  }
+  .vis-icon {
+    font-size: 52px; margin-bottom: 20px; display: block;
+    line-height: 1;
+  }
+  .vis-stat {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px; line-height: 1;
+    background: linear-gradient(135deg, var(--white), var(--blue-light));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 4px;
+  }
+  .vis-stat-label {
+    font-size: 13px; color: var(--gray); letter-spacing: 2px;
+    text-transform: uppercase; font-family: 'DM Mono', monospace;
+  }
+  .vis-tags {
+    display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px;
+  }
+  .vis-tag {
+    background: rgba(37,99,255,0.08);
+    border: 1px solid rgba(37,99,255,0.2);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 12px; letter-spacing: 1px;
+    color: var(--blue-light);
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* COMPARISON TABLE */
+  .comparison {
+    max-width: 900px; margin: 0 auto;
+    padding: 0 48px 120px;
+    position: relative; z-index: 1;
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .comparison.visible { opacity: 1; transform: translateY(0); }
+  .comparison h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 6vw, 72px);
+    letter-spacing: 2px; margin-bottom: 48px;
+    text-align: center;
+  }
+  .comparison h2 em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--blue), var(--blue-light));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  table {
+    width: 100%; border-collapse: collapse;
+  }
+  thead th {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--gray); padding: 16px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    text-align: left;
+  }
+  thead th:not(:first-child) { text-align: center; }
+  thead th.col-vta {
+    color: var(--blue-light);
+    background: rgba(37,99,255,0.05);
+    border-radius: 8px 8px 0 0;
+  }
+  tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.2s;
+  }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  tbody td {
+    padding: 18px 24px; font-size: 14px; color: var(--gray-light);
+  }
+  tbody td:first-child { font-weight: 500; color: var(--white); }
+  tbody td:not(:first-child) { text-align: center; }
+  tbody td.col-vta {
+    background: rgba(37,99,255,0.04);
+    color: var(--blue-light); font-weight: 600;
+  }
+  .check { color: #34d399; font-size: 18px; }
+  .cross { color: #6b7280; font-size: 18px; }
+  .partial { color: #fbbf24; font-size: 14px; font-family: 'DM Mono', monospace; }
+
+  /* BOTTOM CTA */
+  .bottom-cta {
+    text-align: center;
+    padding: 80px 48px 120px;
+    position: relative; z-index: 1;
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .bottom-cta.visible { opacity: 1; transform: translateY(0); }
+  .bottom-cta h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 8vw, 100px);
+    letter-spacing: 2px; line-height: 0.95;
+    margin-bottom: 20px;
+  }
+  .bottom-cta h2 em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--blue), var(--blue-light));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .bottom-cta p { font-size: 17px; color: var(--gray-light); margin-bottom: 40px; line-height: 1.7; }
+  .cta-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--blue); color: white; text-decoration: none;
+    padding: 16px 40px; font-size: 14px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    border-radius: 4px; border: 1px solid transparent;
+    transition: all 0.3s; display: inline-block;
+  }
+  .btn-primary:hover {
+    background: transparent; border-color: var(--blue);
+    color: var(--blue-light); box-shadow: 0 0 30px var(--blue-glow);
+  }
+  .btn-ghost {
+    background: transparent; color: var(--white); text-decoration: none;
+    padding: 16px 40px; font-size: 14px; font-weight: 600;
+    letter-spacing: 2px; text-transform: uppercase;
+    border-radius: 4px; border: 1px solid rgba(255,255,255,0.15);
+    transition: all 0.3s; display: inline-block;
+  }
+  .btn-ghost:hover { border-color: rgba(255,255,255,0.4); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 60px 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 24px;
+    position: relative; z-index: 1;
+  }
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px; letter-spacing: 4px;
+    background: linear-gradient(135deg, #2563ff, #60a5fa);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .footer-links { display: flex; gap: 32px; }
+  .footer-links a { color: var(--gray); text-decoration: none; font-size: 13px; letter-spacing: 1px; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--white); }
+  .footer-copy { font-size: 12px; color: var(--gray); font-family: 'DM Mono', monospace; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+    50% { opacity: 0.8; transform: translateX(-50%) scale(1.1); }
+  }
+  @keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100vh); }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    .page-hero { padding: 120px 24px 60px; }
+    .reasons { padding: 20px 24px 80px; }
+    .reason-row { grid-template-columns: 1fr; gap: 40px; }
+    .reason-row:nth-child(even) .reason-visual { order: 0; }
+    .comparison { padding: 0 24px 80px; }
+    .bottom-cta { padding: 60px 24px 80px; }
+    footer { padding: 40px 24px; flex-direction: column; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+    table { font-size: 12px; }
+    tbody td, thead th { padding: 12px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+<div class="grid-overlay"></div>
+<div class="scanline"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="vtaplates.html" class="nav-logo">VTA PLATES</a>
+  <div class="nav-links">
+    <a href="why.html" class="active">Why VTA</a>
+    <a href="https://tiktok.com/@vta.plates" target="_blank">TikTok</a>
+    <a href="mailto:vtaplates@gmail.com" class="nav-cta">Order Now</a>
+  </div>
+</nav>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="orb orb-1"></div>
+  <div class="page-eyebrow">— The Case for VTA —</div>
+  <h1 class="page-title">WHY <em>VTA</em></h1>
+  <p class="page-subtitle">Not all plates are built the same. Here's exactly what separates VTA from everything else on the market.</p>
+</section>
+
+<!-- REASONS -->
+<div class="reasons">
+
+  <!-- 01 3D Printed -->
+  <div class="reason-row">
+    <div class="reason-content">
+      <div class="reason-num">01</div>
+      <div class="reason-label">The Process</div>
+      <h2 class="reason-title">3D PRINTED,<br>NOT STAMPED</h2>
+      <div class="reason-bar"></div>
+      <p class="reason-body">Most plates are stamped or injection molded in bulk — made cheap, made fast, made for no one in particular. Every VTA plate is 3D printed from scratch when you order it. That means sharper edges, tighter detail, and a finish that actually reflects the craft behind it. No molds. No shortcuts.</p>
+    </div>
+    <div class="reason-visual">
+      <div class="vis-card">
+        <span class="vis-icon">🖨️</span>
+        <div class="vis-stat">100%</div>
+        <div class="vis-stat-label">3D Printed</div>
+        <div class="vis-tags" style="margin-top:20px;">
+          <span class="vis-tag">FDM Process</span>
+          <span class="vis-tag">Layer Precision</span>
+          <span class="vis-tag">Sharp Detail</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 Made to Order -->
+  <div class="reason-row">
+    <div class="reason-content">
+      <div class="reason-num">02</div>
+      <div class="reason-label">Production Model</div>
+      <h2 class="reason-title">MADE WHEN<br>YOU ORDER</h2>
+      <div class="reason-bar"></div>
+      <p class="reason-body">Nothing sits in a warehouse waiting to be sold. When you place an order, that's when your plate gets built — fresh, specific to you. It means zero dead inventory, zero generic product pulled from a shelf. Your plate is yours from the moment it starts printing.</p>
+    </div>
+    <div class="reason-visual">
+      <div class="vis-card">
+        <span class="vis-icon">📦</span>
+        <div class="vis-stat">0</div>
+        <div class="vis-stat-label">Pre-made stock</div>
+        <div class="vis-tags" style="margin-top:20px;">
+          <span class="vis-tag">Built Fresh</span>
+          <span class="vis-tag">No Warehouse</span>
+          <span class="vis-tag">Your Spec</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 Built for Electric -->
+  <div class="reason-row">
+    <div class="reason-content">
+      <div class="reason-num">03</div>
+      <div class="reason-label">Purpose Built</div>
+      <h2 class="reason-title">BUILT FOR<br>ELECTRIC</h2>
+      <div class="reason-bar"></div>
+      <p class="reason-body">VTA plates are designed specifically around E-Bikes and E-Moto mounting hardware. Not repurposed from a gas bike, not a universal fit that fits nothing well. The dimensions, the bracket points, the proportions — all dialed in for the electric era of riding.</p>
+    </div>
+    <div class="reason-visual">
+      <div class="vis-card">
+        <span class="vis-icon">⚡</span>
+        <div class="vis-stat">E-MOTO</div>
+        <div class="vis-stat-label">Native fit</div>
+        <div class="vis-tags" style="margin-top:20px;">
+          <span class="vis-tag">E-Bike Ready</span>
+          <span class="vis-tag">E-Moto Ready</span>
+          <span class="vis-tag">Surron • Talaria</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 Custom Color -->
+  <div class="reason-row">
+    <div class="reason-content">
+      <div class="reason-num">04</div>
+      <div class="reason-label">Personalization</div>
+      <h2 class="reason-title">ANY COLOR.<br>YOUR NUMBER.</h2>
+      <div class="reason-bar"></div>
+      <p class="reason-body">Pick any color. Pick your number. That's it — that's the whole process. You're not choosing from a dropdown of four options or settling for something close. You tell us what you want and we build it exactly that way. Your bike, your plate, your colors.</p>
+    </div>
+    <div class="reason-visual">
+      <div class="vis-card">
+        <span class="vis-icon">🎨</span>
+        <div class="vis-stat">∞</div>
+        <div class="vis-stat-label">Color Options</div>
+        <div class="vis-tags" style="margin-top:20px;">
+          <span class="vis-tag">Any Color</span>
+          <span class="vis-tag">Any Number</span>
+          <span class="vis-tag">Full Custom</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 Motorsport DNA -->
+  <div class="reason-row">
+    <div class="reason-content">
+      <div class="reason-num">05</div>
+      <div class="reason-label">Design</div>
+      <h2 class="reason-title">MOTORSPORT<br>DNA</h2>
+      <div class="reason-bar"></div>
+      <p class="reason-body">The shape, the mesh, the number placement — every design decision is pulled from real motorsport aesthetics. This isn't a novelty item. It's a detail that makes your build look intentional, like it belongs on a track. Because it does.</p>
+    </div>
+    <div class="reason-visual">
+      <div class="vis-card">
+        <span class="vis-icon">🏁</span>
+        <div class="vis-stat">RACE</div>
+        <div class="vis-stat-label">Inspired Design</div>
+        <div class="vis-tags" style="margin-top:20px;">
+          <span class="vis-tag">Mesh Grill</span>
+          <span class="vis-tag">Number Plate</span>
+          <span class="vis-tag">Track Aesthetic</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- COMPARISON TABLE -->
+<div class="comparison" id="comparison">
+  <div class="section-label" style="justify-content:center; margin-bottom:32px;">How We Stack Up</div>
+  <h2>VTA VS <em>THE REST</em></h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th class="col-vta">VTA Plates</th>
+        <th>Generic Brand</th>
+        <th>DIY / eBay</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>3D Printed</td>
+        <td class="col-vta"><span class="check">✓</span></td>
+        <td><span class="cross">✗</span></td>
+        <td><span class="partial">maybe</span></td>
+      </tr>
+      <tr>
+        <td>Made to Order</td>
+        <td class="col-vta"><span class="check">✓</span></td>
+        <td><span class="cross">✗</span></td>
+        <td><span class="cross">✗</span></td>
+      </tr>
+      <tr>
+        <td>Custom Color</td>
+        <td class="col-vta"><span class="check">✓</span></td>
+        <td><span class="partial">limited</span></td>
+        <td><span class="partial">maybe</span></td>
+      </tr>
+      <tr>
+        <td>Custom Number</td>
+        <td class="col-vta"><span class="check">✓</span></td>
+        <td><span class="cross">✗</span></td>
+        <td><span class="partial">sometimes</span></td>
+      </tr>
+      <tr>
+        <td>E-Bike / E-Moto Fit</td>
+        <td class="col-vta"><span class="check">✓</span></td>
+        <td><span class="partial">varies</span></td>
+        <td><span class="partial">varies</span></td>
+      </tr>
+      <tr>
+        <td>Motorsport Aesthetic</td>
+        <td class="col-vta"><span class="check">✓</span></td>
+        <td><span class="cross">✗</span></td>
+        <td><span class="cross">✗</span></td>
+      </tr>
+      <tr>
+        <td>Direct Order (No Middleman)</td>
+        <td class="col-vta"><span class="check">✓</span></td>
+        <td><span class="cross">✗</span></td>
+        <td><span class="check">✓</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- BOTTOM CTA -->
+<div class="bottom-cta" id="bottomCta">
+  <div class="section-label" style="justify-content:center; margin-bottom:24px;">Ready?</div>
+  <h2>GET YOUR<br><em>PLATE</em></h2>
+  <p>Email us with your color, number, and bike model. We'll handle the rest.</p>
+  <div class="cta-btns">
+    <a href="mailto:vtaplates@gmail.com" class="btn-primary">Order Now →</a>
+    <a href="vtaplates.html" class="btn-ghost">← Back to Home</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">VTA PLATES</div>
+  <div class="footer-links">
+    <a href="mailto:vtaplates@gmail.com">vtaplates@gmail.com</a>
+    <a href="https://tiktok.com/@vta.plates" target="_blank">TikTok</a>
+    <a href="vtaplates.html">Home</a>
+  </div>
+  <div class="footer-copy">© 2025 VTA Plates. All rights reserved.</div>
+</footer>
+
+<script>
+// PARTICLES
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+
+const particles = [];
+for (let i = 0; i < 80; i++) {
+  particles.push({
+    x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+    vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
+    size: Math.random() * 1.5 + 0.3,
+    opacity: Math.random() * 0.4 + 0.1,
+    color: Math.random() > 0.6 ? '#2563ff' : '#ffffff'
+  });
+}
+function drawParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach((p, i) => {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0) p.x = canvas.width;
+    if (p.x > canvas.width) p.x = 0;
+    if (p.y < 0) p.y = canvas.height;
+    if (p.y > canvas.height) p.y = 0;
+    particles.forEach((p2, j) => {
+      if (i >= j) return;
+      const dx = p.x - p2.x, dy = p.y - p2.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 120) {
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(37,99,255,${0.06 * (1 - dist/120)})`;
+        ctx.lineWidth = 0.5;
+        ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+      }
+    });
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = p.color === '#2563ff' ? `rgba(37,99,255,${p.opacity})` : `rgba(255,255,255,${p.opacity * 0.5})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// SCROLL REVEAL
+const revealEls = document.querySelectorAll('.reason-row, .comparison, .bottom-cta');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.12 });
+revealEls.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
