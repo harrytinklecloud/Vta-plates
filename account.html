@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VTAPLATES Account & Orders</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./assets/styles.css" />
+    <script src="./assets/config.js"></script>
+    <script type="module" src="./assets/js/account.js"></script>
+  </head>
+  <body data-page="account">
+    <div class="site-shell">
+      <header class="topbar">
+        <a class="brand" href="./index.html">
+          <span class="brand-mark">VTA</span>
+          <span class="brand-copy">
+            <strong>VTAPLATES</strong>
+            <small>3D Printed Plate Lab</small>
+          </span>
+        </a>
+
+        <nav class="nav">
+          <a href="./index.html">Home</a>
+          <a href="./shop.html">Shop</a>
+          <a href="https://tiktok.com/@vta.plates" target="_blank" rel="noreferrer" data-config-link="tiktok">TikTok</a>
+        </nav>
+      </header>
+
+      <main class="page-stack">
+        <section class="page-hero reveal">
+          <div>
+            <p class="eyebrow">Account + tracker</p>
+            <h1>Sign in, place orders, and watch the status move.</h1>
+            <p class="lede">
+              This account system uses VTAPLATES-managed credentials in KV so customers
+              can track orders without a third-party auth provider.
+            </p>
+          </div>
+        </section>
+
+        <section class="account-layout">
+          <div class="glass-card auth-card reveal">
+            <div class="segmented-control auth-tabs" role="tablist" aria-label="Account forms">
+              <label class="segment active">
+                <input type="radio" name="authMode" value="login" checked />
+                <span>Sign in</span>
+              </label>
+              <label class="segment">
+                <input type="radio" name="authMode" value="register" />
+                <span>Create account</span>
+              </label>
+            </div>
+
+            <div id="auth-status" class="banner"></div>
+
+            <form id="login-form" class="form-grid">
+              <label>
+                Email
+                <input type="email" name="email" required />
+              </label>
+              <label>
+                Password
+                <input type="password" name="password" required />
+              </label>
+              <button class="button button-primary full-span" type="submit">Sign in</button>
+            </form>
+
+            <form id="register-form" class="form-grid hidden">
+              <label>
+                Full name
+                <input type="text" name="name" required />
+              </label>
+              <label>
+                Email
+                <input type="email" name="email" required />
+              </label>
+              <label>
+                Password
+                <input type="password" name="password" minlength="8" required />
+              </label>
+              <button class="button button-primary full-span" type="submit">Create account</button>
+            </form>
+          </div>
+
+          <div class="glass-card orders-card reveal">
+            <div class="orders-header">
+              <div>
+                <p class="eyebrow">Customer orders</p>
+                <h2 id="orders-title">Your tracker</h2>
+              </div>
+              <button id="logout-button" class="button button-secondary hidden" type="button">
+                Log out
+              </button>
+            </div>
+
+            <div id="orders-status" class="banner"></div>
+            <div id="orders-list" class="orders-list"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

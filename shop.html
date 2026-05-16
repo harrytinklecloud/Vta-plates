@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VTAPLATES Shop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./assets/styles.css" />
+    <script src="./assets/config.js"></script>
+    <script type="module" src="./assets/js/shop.js"></script>
+  </head>
+  <body data-page="shop">
+    <div class="site-shell">
+      <header class="topbar">
+        <a class="brand" href="./index.html">
+          <span class="brand-mark">VTA</span>
+          <span class="brand-copy">
+            <strong>VTAPLATES</strong>
+            <small>3D Printed Plate Lab</small>
+          </span>
+        </a>
+
+        <nav class="nav">
+          <a href="./index.html">Home</a>
+          <a href="./account.html">Orders</a>
+          <a href="https://tiktok.com/@vta.plates" target="_blank" rel="noreferrer" data-config-link="tiktok">TikTok</a>
+        </nav>
+      </header>
+
+      <main class="page-stack">
+        <section class="page-hero reveal">
+          <div>
+            <p class="eyebrow">Actual shop</p>
+            <h1>Build your plate and send it straight into the order queue.</h1>
+            <p class="lede">
+              Add one or more plates to your cart, customize each one, and choose
+              pickup at Cabrillo Bike Cages or shipped delivery.
+            </p>
+          </div>
+          <div class="hero-badges">
+            <span>$20 each</span>
+            <span>Vented add-on included</span>
+            <span>Account required for tracking</span>
+          </div>
+        </section>
+
+        <section class="shop-layout">
+          <div class="product-column">
+            <div id="shop-status" class="banner"></div>
+            <section class="shop-steps">
+              <article class="step-pill-card is-current">
+                <span>1</span>
+                <div>
+                  <strong>Choose a base</strong>
+                  <small>Motocutz or ODI</small>
+                </div>
+              </article>
+              <article class="step-pill-card">
+                <span>2</span>
+                <div>
+                  <strong>Customize it</strong>
+                  <small>Name, number, vented</small>
+                </div>
+              </article>
+              <article class="step-pill-card">
+                <span>3</span>
+                <div>
+                  <strong>Review and checkout</strong>
+                  <small>Pickup or ship</small>
+                </div>
+              </article>
+            </section>
+            <div id="product-grid" class="product-grid"></div>
+
+            <section class="glass-card builder-card">
+              <div class="section-heading compact">
+                <p class="eyebrow">Step 2</p>
+                <h2>Customize one plate</h2>
+                <p class="microcopy">
+                  Pick a base above, fill this out once, and add it to your cart. Repeat if you want multiple plates.
+                </p>
+              </div>
+
+              <div class="builder-layout">
+                <div id="selected-product-preview" class="selected-product-preview"></div>
+
+                <form id="builder-form" class="form-grid">
+                  <label>
+                    Rider name
+                    <input id="builder-rider-name" name="riderName" type="text" placeholder="Jax" required />
+                  </label>
+                  <label>
+                    Custom number
+                    <input id="builder-custom-number" name="customNumber" type="text" maxlength="8" placeholder="247" required />
+                  </label>
+                  <label class="full-span">
+                    Plate note
+                    <input id="builder-note" name="itemNote" type="text" placeholder="Color, vibe, or extra info" />
+                  </label>
+                  <label class="full-span inline-checkbox">
+                    <input id="builder-vented" name="vented" type="checkbox" checked />
+                    Add vented plate for free
+                  </label>
+                  <button id="builder-submit" class="button button-primary full-span" type="submit">
+                    Add This Plate To Cart
+                  </button>
+                </form>
+              </div>
+            </section>
+          </div>
+
+          <aside class="checkout-column">
+            <section class="glass-card checkout-card">
+              <div class="section-heading compact">
+                <p class="eyebrow">Step 3</p>
+                <h2>Your build list</h2>
+                <p class="microcopy">Check your plates here before you submit the order.</p>
+              </div>
+              <div id="cart-items" class="cart-items"></div>
+              <div class="form-grid" style="margin-top: 16px">
+                <label>
+                  Promo code
+                  <input id="promo-code" type="text" placeholder="FLAT5 or SAVE10" />
+                </label>
+                <label>
+                  Creator code
+                  <input id="creator-code" type="text" placeholder="Support a creator" />
+                </label>
+                <button id="apply-codes-button" class="button button-secondary full-span" type="button">
+                  Apply Codes
+                </button>
+              </div>
+              <div id="discount-breakdown" class="microcopy" style="margin-top: 12px"></div>
+              <div class="cart-total">
+                <span>Checkout total</span>
+                <strong id="cart-total">$0</strong>
+              </div>
+            </section>
+
+            <section class="glass-card checkout-card">
+              <div class="section-heading compact">
+                <p class="eyebrow">Final checkout</p>
+                <h2>Customer details</h2>
+                <p class="microcopy">Choose pickup or shipping, then submit everything in one go.</p>
+              </div>
+
+              <form id="checkout-form" class="form-grid">
+                <label>
+                  Full name
+                  <input id="customer-name" name="customerName" type="text" required />
+                </label>
+                <label>
+                  Email
+                  <input id="customer-email" name="customerEmail" type="email" required />
+                </label>
+
+                <div class="segmented-control" role="tablist" aria-label="Fulfillment mode">
+                  <label class="segment active">
+                    <input type="radio" name="fulfillmentMode" value="pickup" checked />
+                    <span>Pickup</span>
+                  </label>
+                  <label class="segment">
+                    <input type="radio" name="fulfillmentMode" value="shipping" />
+                    <span>Shipped</span>
+                  </label>
+                </div>
+
+                <div id="pickup-fields" class="form-panel">
+                  <label>
+                    Pickup time
+                    <select id="pickup-window" name="pickupWindow">
+                      <option value="After school">After school</option>
+                      <option value="Before school">Before school</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    Pickup date
+                    <input id="pickup-date" name="pickupDate" type="date" required />
+                  </label>
+
+                  <p class="microcopy">
+                    Pickup happens at Cabrillo Bike Cages. Weekends and holidays are blocked.
+                  </p>
+                </div>
+
+                <div id="shipping-fields" class="form-panel hidden">
+                  <label>
+                    Street address
+                    <input id="ship-street" name="shipStreet" type="text" />
+                  </label>
+                  <label>
+                    City
+                    <input id="ship-city" name="shipCity" type="text" />
+                  </label>
+                  <label>
+                    State
+                    <input id="ship-state" name="shipState" type="text" maxlength="2" />
+                  </label>
+                  <label>
+                    ZIP code
+                    <input id="ship-zip" name="shipZip" type="text" />
+                  </label>
+
+                  <div class="payment-box">
+                    <div>
+                      <strong>Apple Pay required</strong>
+                      <p>
+                        Shipping orders are marked for Apple Pay. If the browser cannot open
+                        Apple Pay directly, the order is created in pending-payment mode.
+                      </p>
+                    </div>
+                    <button id="apple-pay-button" class="apple-pay-button" type="button">
+                      Pay with Apple Pay
+                    </button>
+                  </div>
+                </div>
+
+                <label class="full-span">
+                  Order note
+                  <textarea id="order-note" name="orderNote" rows="3" placeholder="Anything the shop should know?"></textarea>
+                </label>
+
+                <div class="full-span account-callout" id="account-callout"></div>
+                <button id="checkout-button" class="button button-primary full-span" type="submit">
+                  Submit Order
+                </button>
+              </form>
+            </section>
+          </aside>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

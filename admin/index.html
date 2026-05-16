@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VTAPLATES Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/styles.css" />
+    <script src="../assets/config.js"></script>
+    <script type="module" src="../assets/js/admin.js"></script>
+  </head>
+  <body data-page="admin">
+    <div class="site-shell">
+      <header class="topbar">
+        <a class="brand" href="../index.html">
+          <span class="brand-mark">VTA</span>
+          <span class="brand-copy">
+            <strong>VTAPLATES</strong>
+            <small>Admin Console</small>
+          </span>
+        </a>
+
+        <nav class="nav">
+          <a href="../index.html">Home</a>
+          <a href="../shop.html">Shop</a>
+          <a href="../account.html">Orders</a>
+          <a href="https://tiktok.com/@vta.plates" target="_blank" rel="noreferrer" data-config-link="tiktok">TikTok</a>
+        </nav>
+      </header>
+
+      <main class="page-stack">
+        <section class="page-hero reveal">
+          <div>
+            <p class="eyebrow">Admin / packer view</p>
+            <h1>Manage listings, active orders, and past fulfillment.</h1>
+            <p class="lede">
+              Orders, products, images, and pickup blackout dates all live in the Worker-backed
+              admin flow so the packer can work from one place.
+            </p>
+          </div>
+        </section>
+
+        <section class="admin-layout">
+          <div class="glass-card admin-login reveal">
+            <div class="section-heading compact">
+              <p class="eyebrow">Sign in</p>
+              <h2>Admin access</h2>
+            </div>
+            <div id="admin-auth-status" class="banner"></div>
+            <form id="admin-login-form" class="form-grid">
+              <label>
+                Email
+                <input type="email" name="email" value="admin@vtaplates.com" required />
+              </label>
+              <label>
+                Password
+                <input type="password" name="password" placeholder="Admin password" required />
+              </label>
+              <button class="button button-primary full-span" type="submit">Open Admin</button>
+            </form>
+            <button id="admin-logout-button" class="button button-secondary hidden" type="button">
+              Log out
+            </button>
+          </div>
+
+          <div class="glass-card admin-panel reveal">
+            <div class="segmented-control admin-tabs" role="tablist" aria-label="Admin sections">
+              <label class="segment active">
+                <input type="radio" name="adminTab" value="orders" checked />
+                <span>Orders</span>
+              </label>
+              <label class="segment">
+                <input type="radio" name="adminTab" value="past" />
+                <span>Past Orders</span>
+              </label>
+              <label class="segment">
+                <input type="radio" name="adminTab" value="products" />
+                <span>Products</span>
+              </label>
+              <label class="segment">
+                <input type="radio" name="adminTab" value="codes" />
+                <span>Promo Codes</span>
+              </label>
+              <label class="segment">
+                <input type="radio" name="adminTab" value="settings" />
+                <span>Settings</span>
+              </label>
+            </div>
+
+            <div id="admin-panel-status" class="banner"></div>
+
+            <section id="admin-orders-panel" class="admin-panel-section">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Active queue</p>
+                  <h2>Orders</h2>
+                </div>
+                <button id="refresh-orders" class="button button-secondary" type="button">Refresh</button>
+              </div>
+              <div id="active-orders" class="orders-list"></div>
+            </section>
+
+            <section id="admin-past-panel" class="admin-panel-section hidden">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Archive</p>
+                  <h2>Past Orders</h2>
+                </div>
+              </div>
+              <div id="past-orders" class="orders-list"></div>
+            </section>
+
+            <section id="admin-products-panel" class="admin-panel-section hidden">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Catalog</p>
+                  <h2>Products</h2>
+                </div>
+                <button id="new-product-button" class="button button-secondary" type="button">New Product</button>
+              </div>
+              <div id="admin-products" class="admin-products"></div>
+            </section>
+
+            <section id="admin-codes-panel" class="admin-panel-section hidden">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Discount logic</p>
+                  <h2>Promo Codes</h2>
+                </div>
+                <button id="new-code-button" class="button button-secondary" type="button">New Code</button>
+              </div>
+              <div id="admin-codes" class="admin-products"></div>
+            </section>
+
+            <section id="admin-settings-panel" class="admin-panel-section hidden">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Store settings</p>
+                  <h2>Pickup rules</h2>
+                </div>
+              </div>
+              <form id="settings-form" class="form-grid">
+                <label>
+                  Pickup location
+                  <input type="text" name="pickupLocation" />
+                </label>
+                <label>
+                  TikTok URL
+                  <input type="url" name="tiktokUrl" />
+                </label>
+                <label class="full-span">
+                  Additional blackout dates
+                  <textarea
+                    name="blackoutDates"
+                    rows="5"
+                    placeholder="One YYYY-MM-DD date per line"
+                  ></textarea>
+                </label>
+                <label class="full-span">
+                  Pickup windows
+                  <input type="text" name="pickupWindows" placeholder="After school, Before school" />
+                </label>
+                <button class="button button-primary full-span" type="submit">Save Settings</button>
+              </form>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
